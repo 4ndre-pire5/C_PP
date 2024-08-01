@@ -3,22 +3,23 @@
 #include <algorithm>
 #include <ctime>
 #include <cstdlib>
+#include <set>
 
 using namespace std;
 
 vector<int> sortearNumeros(unsigned int quantidade, unsigned int limite)
 {
     vector<int> sorteados;
-
-    srand(time(0));
+    set<int> numerosSorteados;
 
     // Sorteia 15 numeros sem repetição
     while (sorteados.size() < quantidade)
     {
         int num = rand() % limite + 1;
-        if (find(sorteados.begin(), sorteados.end(), num) == sorteados.end())
+        if (numerosSorteados.find(num) == numerosSorteados.end())
         {
             sorteados.push_back(num);
+            numerosSorteados.insert(num);
         }
         // Ordena o vetor em ordem crescente
         sort(sorteados.begin(), sorteados.end());
@@ -29,39 +30,61 @@ vector<int> sortearNumeros(unsigned int quantidade, unsigned int limite)
 
 int main()
 {
-    vector<int> numeros;
-    char sortear;
+    srand(time(0));
 
+    int totalCartelas = 0;
+
+    do
+    {
+        cout << "Digite o numero de cartelas (1 a 20): ";
+        cin >> totalCartelas;
+    } while (totalCartelas < 1 || totalCartelas > 20);
+
+    vector<vector<vector<int>>> matrizes(totalCartelas, vector<vector<int>>(3, vector<int>(5)));
+
+    char sortear;
     string msg = "Digite 's' para sortear os numeros\n";
 
-    cout << msg;
-    cin >> sortear;
-
-    if (sortear == 's')
+    while (sortear != 's')
     {
-        numeros = sortearNumeros(15, 90);
+        cout << msg;
+        cin >> sortear;
     }
-    else cout << msg;
 
-    // Matriz 3x5 para armazenar os números
-    int matriz[3][5];
-
-    // Copiando os números para a matriz, preenchendo por colunas
-    int k = 0;
-    for (int j = 0; j < 5; j++)
+    for (int m = 0; m < totalCartelas; m++)
     {
-        for (int i = 0; i < 3; i++)
+        vector<int> numeros = sortearNumeros(15, 90);
+
+        int k = 0;
+        for (int j = 0; j < 5; j++)
         {
-            matriz[i][j] = numeros[k];
-            k++;
+            for (int i = 0; i < 3; i++)
+            {
+                matrizes[m][i][j] = numeros[k];
+                k++;
+            }
         }
     }
 
-    for (int i = 0; i < 3; i++)
+    // Exibindo as matrizes lado a lado com no máximo 5 por linha
+    int matrizes_por_linha = 5;
+    for (int linha_atual = 0; linha_atual < totalCartelas; linha_atual += matrizes_por_linha)
     {
-        for (int j = 0; j < 5; j++)
+        // Determinar quantas matrizes exibir nesta linha (5 ou o restante)
+        int matrizes_nesta_linha = min(matrizes_por_linha, totalCartelas - linha_atual);
+
+        // Exibir cada linha de cada matriz da linha atual
+        for (int i = 0; i < 3; i++) // 3 linhas por matriz
         {
-            cout << matriz[i][j] << " ";
+            for (int m = linha_atual; m < linha_atual + matrizes_nesta_linha; m++)
+            {
+                for (int j = 0; j < 5; j++) // 5 colunas por matriz
+                {
+                    cout << matrizes[m][i][j] << " ";
+                }
+                cout << "\t";  // Espaço entre as matrizes
+            }
+            cout << endl;
         }
         cout << endl;
     }
